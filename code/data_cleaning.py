@@ -1,6 +1,6 @@
 import pandas as pd
 
-df_names_org = pd.read_csv('../data/forenames(original).csv', low_memory=False)
+df_names_org = pd.read_csv('../data/forenames_original.csv', low_memory=False)
 
 num_forenames = len(df_names_org)
 
