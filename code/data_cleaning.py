@@ -16,4 +16,6 @@ df_names.reset_index(drop=True, inplace=True)
 
 df_names['forename'] = df_names['forename'].fillna('')
 
+df_names['gender'] = df_names['gender'].map({'M': 0, 'F': 1})
+
 df_names.to_csv('../data/names.csv', index = False)
