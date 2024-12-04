@@ -4,7 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 df_names = pd.read_csv('../data/names.csv')
 
-vectorizer_forename = TfidfVectorizer(analyzer='char', ngram_range=(3,5))
+vectorizer_forename = TfidfVectorizer(analyzer='char', ngram_range=(1,2))
 
 X_forename = vectorizer_forename.fit_transform(df_names['forename'])
 

@@ -4,7 +4,9 @@ df_names_org = pd.read_csv('../data/forenames_original.csv', low_memory=False)
 
 num_forenames = len(df_names_org)
 
-df_names = df_names_org.sample(n=min(100000, num_forenames), random_state=42)
+df_males = df_names_org[df_names_org['gender'] == 'M'].sample(n=50000, random_state=42, replace=False)
+df_females = df_names_org[df_names_org['gender'] == 'F'].sample(n=50000, random_state=42, replace=False)
+df_names = pd.concat([df_males, df_females]).reset_index(drop=True)
 
 df_names = df_names.drop(columns=['country', 'count'])
 
