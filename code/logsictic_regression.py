@@ -16,37 +16,67 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 
-steps = [
+pipeline = Pipeline([
     ('scaler', StandardScaler(with_mean=False)),
-    ('logReg', LogisticRegression(penalty="l1", C=1, solver='liblinear'))
-]
+    ('logReg', LogisticRegression(solver='liblinear'))
+])
 
-LR_pipeline = Pipeline(steps)
-LR_pipeline.fit(X_train, y_train)
+from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'logReg__penalty': ['l1', 'l2'],
+    'logReg__C': [0.01, 0.1, 1, 10, 100]
+}
+
+grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, cv=5, scoring='accuracy', n_jobs=-1)
+
+grid_search.fit(X_train, y_train)
+
+best_pipeline = grid_search.best_estimator_
+best_params = grid_search.best_params_
+print(f"Best Parameters: {best_params}")
 
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_auc_score
 
+ypred_test = best_pipeline.predict(X_test)
+mat_clf_test = confusion_matrix(y_test, ypred_test)
+report_clf_test = classification_report(y_test, ypred_test)
 
-ypred_test = LR_pipeline.predict(X_test)
-mat_clf = confusion_matrix(y_test, ypred_test)
-report_clf = classification_report(y_test, ypred_test)
+print("Confusion Matrix on Test Data:")
+print(mat_clf_test)
+print("\nClassification Report on Test Data:")
+print(report_clf_test)
 
-print(mat_clf)
-print(report_clf)
+ypred_testP = best_pipeline.predict_proba(X_test)
+auc_test = roc_auc_score(y_test, ypred_test  [:, 1])
+print(f"Test AUC Score: {auc_test}")
 
-ypred_testP = LR_pipeline.predict_proba(X_test)
-auc = roc_auc_score(y_test, ypred_testP[:,1])
-print(auc)
+single_name = "Myo"
 
-ypred_train = LR_pipeline.predict(X_train)
-mat_clf = confusion_matrix(y_train, ypred_train)
-report_clf = classification_report(y_train, ypred_train)
+single_name_vectorized = vectorizer_forename.transform([single_name])
 
-print(mat_clf)
-print(report_clf)
+predicted_gender = best_pipeline.predict(single_name_vectorized)
+print(f"Predicted Gender (0 = Male, 1 = Female): {predicted_gender[0]}")
 
-ypred_trainP = LR_pipeline.predict_proba(X_train)
-auc = roc_auc_score(y_train, ypred_trainP[:,1])
-print(auc)
+predicted_probabilities = best_pipeline.predict_proba(single_name_vectorized)
+print(f"Probabilities: {predicted_probabilities}")
+
+import pickle
+
+with open('../model.pkl', 'wb') as f:
+    pickle.dump(best_pipeline,f)
+
+with open('../transformer.pkl', 'wb') as f:
+        pickle.dump(vectorizer_forename, f)
+
+
+
+with open('../model.pkl', 'rb') as f:
+    mp = pickle.load(f)
+
+pckl = mp.predict(single_name_vectorized)
+print(f"Predicted Gender (0 = Male, 1 = Female): {pckl[0]}")
+pckl2 = mp.predict_proba(single_name_vectorized)
+print(f"Probabilities: {pckl2}")

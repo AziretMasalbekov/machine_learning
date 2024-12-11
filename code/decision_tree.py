@@ -15,36 +15,56 @@ X_train, X_test, y_train, y_test = train_test_split(X_forename, y_combined, test
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
+
+param_grid = {
+    'DT__criterion': ['gini', 'entropy'],
+    'DT__max_depth': [5, 10, 20, None],
+    'DT__min_samples_split': [2, 5, 10],
+    'DT__min_samples_leaf': [1, 2, 4],
+}
+
 steps = [
     ('scaler', StandardScaler(with_mean=False)),
-    ('DT', DecisionTreeClassifier(criterion='gini', max_depth=10, random_state=42))
+    ('DT', DecisionTreeClassifier(random_state=42))
 ]
 
+from sklearn.model_selection import GridSearchCV
+
 DT_pipeline = Pipeline(steps)
-DT_pipeline.fit(X_train, y_train)
+
+grid_search = GridSearchCV(estimator=DT_pipeline, param_grid=param_grid,
+                           scoring='accuracy', cv=5, verbose=1, n_jobs=-1)
+
+grid_search.fit(X_train, y_train)
 
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_auc_score
 
-ypred_test = DT_pipeline.predict(X_test)
+best_pipeline = grid_search.best_estimator_
+
+ypred_test = best_pipeline.predict(X_test)
 mat_clf = confusion_matrix(y_test, ypred_test)
 report_clf = classification_report(y_test, ypred_test)
 
+print("Confusion Matrix (Test):")
 print(mat_clf)
+print("Classification Report (Test):")
 print(report_clf)
 
-ypred_testP = DT_pipeline.predict_proba(X_test)
-auc = roc_auc_score(y_test, ypred_testP[:,1])
-print(auc)
+ypred_testP = best_pipeline.predict_proba(X_test)
+auc = roc_auc_score(y_test, ypred_testP[:, 1])
+print("AUC Score (Test):", auc)
 
-ypred_train = DT_pipeline.predict(X_train)
+ypred_train = best_pipeline.predict(X_train)
 mat_clf = confusion_matrix(y_train, ypred_train)
 report_clf = classification_report(y_train, ypred_train)
 
+print("Confusion Matrix (Train):")
 print(mat_clf)
+print("Classification Report (Train):")
 print(report_clf)
 
-ypred_trainP = DT_pipeline.predict_proba(X_train)
-auc = roc_auc_score(y_train, ypred_trainP[:,1])
-print(auc)
+ypred_trainP = best_pipeline.predict_proba(X_train)
+auc = roc_auc_score(y_train, ypred_trainP[:, 1])
+print("AUC Score (Train):", auc)

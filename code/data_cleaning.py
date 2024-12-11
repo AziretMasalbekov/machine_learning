@@ -4,10 +4,13 @@ df_names_org = pd.read_csv('../data/forenames_original.csv', low_memory=False)
 
 num_forenames = len(df_names_org)
 
-df_males = df_names_org[df_names_org['gender'] == 'M'].sample(n=50000, random_state=42, replace=False)
-df_females = df_names_org[df_names_org['gender'] == 'F'].sample(n=50000, random_state=42, replace=False)
+df_males = df_names_org[df_names_org['gender'] == 'M'].sample(n=75000, random_state=42, replace=False)
+df_females = df_names_org[df_names_org['gender'] == 'F'].sample(n=75000, random_state=42, replace=False)
 df_names = pd.concat([df_males, df_females]).reset_index(drop=True)
 
+country_num = df_names['country'].nunique()
+
+print(f"Unique country num: {country_num}")
 df_names = df_names.drop(columns=['country', 'count'])
 
 df_names = df_names[df_names['gender'].isin(['F', 'M'])]
