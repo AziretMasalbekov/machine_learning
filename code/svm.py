@@ -14,22 +14,30 @@ X_train, X_test, y_train, y_test = train_test_split(X_forename, y_combined, test
 
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, roc_auc_score
 
-# Linear Kernel
-steps = [('svc', SVC(kernel='linear'))]
-svcL_pipeline = Pipeline(steps)
-svcL_pipeline.fit(X_train, y_train)
-print("Linear Kernel:\n", classification_report(y_test, svcL_pipeline.predict(X_test)))
-
-# Polynomial Kernel
-steps = [('svc', SVC(kernel='poly', degree=3))]
-svcPoly_pipeline = Pipeline(steps)
-svcPoly_pipeline.fit(X_train, y_train)
-print("Polynomial Kernel:\n", classification_report(y_test, svcPoly_pipeline.predict(X_test)))
+# # Linear Kernel
+# steps = [('svc', SVC(kernel='linear'))]
+# svcL_pipeline = Pipeline(steps)
+# svcL_pipeline.fit(X_train, y_train)
+# print("Linear Kernel:\n", classification_report(y_test, svcL_pipeline.predict(X_test)))
+#
+# # Polynomial Kernel
+# steps = [('svc', SVC(kernel='poly', degree=3))]
+# svcPoly_pipeline = Pipeline(steps)
+# svcPoly_pipeline.fit(X_train, y_train)
+# print("Polynomial Kernel:\n", classification_report(y_test, svcPoly_pipeline.predict(X_test)))
 
 # RBF Kernel
-steps = [('svc', SVC(kernel='rbf', class_weight='balanced'))]
+steps = [('svc', SVC(kernel='rbf', class_weight='balanced', probability=True))]
 svcRBF_pipeline = Pipeline(steps)
 svcRBF_pipeline.fit(X_train, y_train)
 print("RBF Kernel:\n", classification_report(y_test, svcRBF_pipeline.predict(X_test)))
+
+import pickle
+
+with open('../model.pkl', 'wb') as f:
+    pickle.dump(svcRBF_pipeline,f)
+
+with open('../transformer.pkl', 'wb') as f:
+        pickle.dump(vectorizer_forename, f)

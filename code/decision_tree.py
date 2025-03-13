@@ -15,20 +15,19 @@ X_train, X_test, y_train, y_test = train_test_split(X_forename, y_combined, test
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import GridSearchCV
 
 param_grid = {
     'DT__criterion': ['gini', 'entropy'],
-    'DT__max_depth': [5, 10, 20, None],
-    'DT__min_samples_split': [2, 5, 10],
-    'DT__min_samples_leaf': [1, 2, 4],
+    'DT__max_depth': [5, 10, 15],
+    'DT__min_samples_split': [2, 5],
+    'DT__min_samples_leaf': [2, 4],
 }
 
 steps = [
     ('scaler', StandardScaler(with_mean=False)),
     ('DT', DecisionTreeClassifier(random_state=42))
 ]
-
-from sklearn.model_selection import GridSearchCV
 
 DT_pipeline = Pipeline(steps)
 

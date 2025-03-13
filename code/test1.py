@@ -7,14 +7,14 @@ with open('../model.pkl', 'rb') as f:
 with open('../transformer.pkl', 'rb') as f:
     transformer = pickle.load(f)
 
-single_name = ""
+single_name = "Jack"
 vectorizer_forename = TfidfVectorizer(analyzer='char', ngram_range=(1,2))
 
 single_name_vectorized = transformer.transform([single_name])
 
 pckl = mp.predict(single_name_vectorized)
-print(f"Predicted Gender (0 = Male, 1 = Female): {pckl[0]}")
-
-pckl2 = mp.predict_proba(single_name_vectorized)
-print(f"Probabilities: {pckl2}")
+if pckl[0] == 1:
+    print("Predicted Gender: Female")
+if pckl[0] == 0:
+    print("Predicted Gender: Male")
 

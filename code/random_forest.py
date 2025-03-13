@@ -1,7 +1,7 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.ensemble import RandomForestClassifier
+
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
 df_names = pd.read_csv('../data/names.csv')
@@ -13,7 +13,11 @@ y_combined = df_names['gender']
 
 X_train, X_test, y_train, y_test = train_test_split(X_forename, y_combined, test_size=0.2, random_state=42)
 
-rf = RandomForestClassifier(random_state=42, class_weight='balanced')
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
 
 param_dist = {
     'n_estimators': [100, 50, 150],
@@ -23,8 +27,13 @@ param_dist = {
     'max_features': ['sqrt', 'log2', None],
 }
 
+pipeline = Pipeline([
+    ('scaler', StandardScaler(with_mean=False)),
+    ('rf', RandomForestClassifier(random_state=42, class_weight='balanced'))
+])
+
 random_search = RandomizedSearchCV(
-    estimator=rf,
+    estimator=pipeline,
     param_distributions=param_dist,
     n_iter=20,
     scoring='roc_auc',

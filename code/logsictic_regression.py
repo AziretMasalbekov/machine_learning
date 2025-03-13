@@ -15,13 +15,12 @@ X_train, X_test, y_train, y_test = train_test_split(X_forename, y_combined, test
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
 
 pipeline = Pipeline([
     ('scaler', StandardScaler(with_mean=False)),
     ('logReg', LogisticRegression(solver='liblinear'))
 ])
-
-from sklearn.model_selection import GridSearchCV
 
 param_grid = {
     'logReg__penalty': ['l1', 'l2'],
